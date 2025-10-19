@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hawkins National Laboratory - Secure Transmission</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #00ff7a;
+      font-family: 'Courier New', monospace;
+      font-size: 1.1rem;
+      padding: 2rem;
+      line-height: 1.6;
+      white-space: pre-line;
+      overflow: hidden;
+    }
+    .blink {
+      animation: blink 1s step-start infinite;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+    @keyframes flicker {
+      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        opacity: 0.99;
+      }
+      20%, 24%, 55% {
+        opacity: 0.4;
+      }
+    }
+    .flicker {
+      animation: flicker 3s infinite;
+    }
+    .typing {
+      border-right: .15em solid #00ff7a;
+      white-space: pre;
+      overflow: hidden;
+      width: 0;
+      animation: typing 8s steps(60, end) forwards;
+    }
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+  </style>
+</head>
+<body>
+  <div class="flicker">
+    <div class="typing">
+HAWKINS NATIONAL LABORATORY
+U.S. Department of Energy
+
+TRANSMISSION: SECURE CHANNEL 11
+---------------------------------------
+Agent ISABELLA – Mission Status: SUCCESS
+
+The Gate is closed.
+Hawkins is safe again.
+---------------------------------------
+"Friends don't lie."
+---------------------------------------
+End of Transmission<span class="blink">_</span>
+    </div>
+  </div>
+</body>
+</html>
