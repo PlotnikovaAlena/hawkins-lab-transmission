@@ -82,7 +82,6 @@
   </div>
 
 <script>
-/* ===== TEXT CONTENT (построчно) ===== */
 const LINES = [
   "HAWKINS NATIONAL LABORATORY – FINAL TRANSMISSION",
   "Date: November 2, 1985",
@@ -110,17 +109,13 @@ const LINES = [
   "TRANSMISSION COMPLETE..."
 ];
 
-/* ===== DOM ===== */
 const term = document.getElementById('terminal');
 const ru = document.getElementById('ruNote');
 const overlay = document.getElementById('overlay');
 const startBtn = document.getElementById('startBtn');
-
-/* ===== Cursor ===== */
 const cursor = document.createElement('span');
 cursor.className = 'cursor'; cursor.textContent = "_";
 
-/* ===== Typing engine ===== */
 let li = 0, ci = 0;
 let lineEl;
 
@@ -135,7 +130,10 @@ function delay(min, max){ return Math.floor(min + Math.random()*(max-min)); }
 function typeNext(){
   if(li >= LINES.length){
     endBeep();
-    setTimeout(()=>{ ru.style.opacity = 1; }, 1200);
+    setTimeout(()=>{
+      ru.style.opacity = 1;
+      finalBeep(); // <--- звуковой сигнал при появлении поздравления
+    }, 1200);
     return;
   }
   const text = LINES[li];
@@ -153,25 +151,24 @@ function typeNext(){
   }
 }
 
-/* ===== Audio (WebAudio, без внешних файлов) ===== */
+/* ===== AUDIO SYSTEM ===== */
 let audioCtx, hissNode, hissGain;
 
 function startAudio(){
-  // Инициализация контекста
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-  // Фоновый шум (white noise)
+  // White noise background
   const bufferSize = 2 * audioCtx.sampleRate;
   const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
   const output = noiseBuffer.getChannelData(0);
   for(let i=0;i<bufferSize;i++){ output[i] = (Math.random()*2-1) * 0.03; }
   hissNode = audioCtx.createBufferSource();
   hissNode.buffer = noiseBuffer; hissNode.loop = true;
-  hissGain = audioCtx.createGain(); hissGain.gain.value = 0.12; // громкость шума
+  hissGain = audioCtx.createGain(); hissGain.gain.value = 0.12;
   hissNode.connect(hissGain).connect(audioCtx.destination);
   hissNode.start();
 
-  // «Пуск» терминала — короткий свип
+  // Boot-up zap
   bootZap();
 }
 
@@ -217,19 +214,28 @@ function endBeep(){
   o.stop(audioCtx.currentTime + 0.26);
 }
 
-/* ===== Start flow (user gesture required for audio) ===== */
+/* 🎵 финальный звуковой сигнал при поздравлении */
+function finalBeep(){
+  if(!audioCtx) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = "sine";
+  o.frequency.setValueAtTime(660, audioCtx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.5);
+  g.gain.value = 0.0001;
+  o.connect(g).connect(audioCtx.destination);
+  o.start();
+  g.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.6);
+  o.stop(audioCtx.currentTime + 0.62);
+}
+
+/* ===== START TRANSMISSION ===== */
 function startTransmission(){
-  // скрыть оверлей
   overlay.style.display = "none";
-
-  // запустить звук
-  try{ startAudio(); } catch(e){ /* игнорируем ошибки аудио-политик */ }
-
-  // подготовить терминал
+  try{ startAudio(); }catch(e){}
   lineEl = newLine();
   term.appendChild(cursor);
-
-  // стартовать печать
   setTimeout(typeNext, 600);
 }
 
